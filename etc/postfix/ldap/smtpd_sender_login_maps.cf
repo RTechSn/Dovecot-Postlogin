@@ -1,0 +1,15 @@
+server_host     = ldaps://dc.mydomain.local
+server_port     = 636
+version         = 3
+bind            = yes
+start_tls       = no
+bind_dn         = vmail@mydomain.local
+bind_pw         = secret
+
+# --- Returns user account given email address belongs to --- #
+search_base     = ou=company,dc=mydomain,dc=local
+scope           = sub
+query_filter = (&(|(mail=%s)(proxyAddresses=smtp:%s)(proxyAddresses=%s))(objectClass=person))
+result_attribute= userPrincipalName
+result_format   = %s
+debuglevel      = 0

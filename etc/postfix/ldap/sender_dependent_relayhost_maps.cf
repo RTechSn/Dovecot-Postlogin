@@ -1,0 +1,16 @@
+server_host     = ldaps://dc.mydomain.local
+server_port     = 636
+version         = 3
+bind            = yes
+start_tls       = no
+bind_dn         = vmail@mydomain.local
+bind_pw         = secret
+
+# --- This will return mail attribute of a group in OU=MailDomains, which should contain a relay address for given domain --- #
+search_base     = OU=MailDomains,DC=mydomain,DC=local
+scope           = sub
+query_filter = (&(objectClass=group)(cn=%d))
+result_attribute= mail
+# Adjust port, 26 is the default for Proxmox Mail Gateway
+result_format   = [%s]:26
+debuglevel      = 0

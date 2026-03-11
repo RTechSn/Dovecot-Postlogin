@@ -1,0 +1,41 @@
+# Load LDAP credentials
+!include /etc/ldap/dovecot.conf
+auth_debug = no
+
+
+passdb ldap {
+  use_worker = yes
+  ldap_bind = yes
+  ldap_connection_group = authdb
+  ldap_filter = (&(|(mail=%{user})(proxyAddresses=smtp:%{user})(proxyAddresses=%{user}))(objectClass=person)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))
+}
+
+
+userdb ldap-user {
+  driver = ldap
+  use_worker = yes
+  ldap_connection_group = userdb
+  # If the user is found, end here, if not - try userdb ldap-group 
+  result_success = return-ok
+  result_failure = continue
+  ldap_filter = (&(|(mail=%{user})(proxyAddresses=smtp:%{user})(proxyAddresses=%{user}))(objectClass=person)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))
+  fields {
+    home = /mnt/mail/homes/%{ldap:sAMAccountName}
+    name = %{ldap:sAMAccountName}
+    mail_path=/mnt/mail/mailboxes/%{user}
+    dn=%{ldap:dn}
+  }
+}
+
+# Get mail_path for user=[group email], needed for delivery to group addresses. Not used in passdb - you can't log in as a group.
+userdb ldap-group {
+  driver = ldap
+  use_worker = yes
+  ldap_connection_group = userdb
+  skip = found
+  ldap_filter = (&(objectClass=group)(|(mail=%{user})(proxyAddresses=%{user})))
+  fields {
+    home=/mnt/mail/homes/%{ldap:name}
+    mail_path=/mnt/mail/mailboxes/%{user}
+  }
+}

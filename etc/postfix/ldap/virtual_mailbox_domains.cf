@@ -1,0 +1,14 @@
+server_host     = ldaps://dc.mydomain.local
+server_port     = 636
+version         = 3
+bind            = yes
+start_tls       = no
+bind_dn         = vmail@mydomain.local
+bind_pw         = secret
+
+# --- This will return positive result, if given domain is present in MailDomains OU --- #
+search_base     = OU=MailDomains,DC=mydomain,DC=local
+scope           = sub
+query_filter = (&(objectClass=group)(cn=%s))
+result_attribute= cn
+debuglevel      = 0

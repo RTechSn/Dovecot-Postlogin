@@ -1,0 +1,2 @@
+mail.mydomain.local /etc/ssl/private/mail.mydomain.local.key /etc/ssl/certs/mail.mydomain.local.pem
+mail.mydomain.com /etc/letsencrypt/live/mail.mydomain.com/privkey.pem /etc/letsencrypt/live/mail.mydomain.com/fullchain.pem

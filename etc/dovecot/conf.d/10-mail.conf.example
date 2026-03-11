@@ -1,0 +1,33 @@
+
+# Dovecot Postlogin script has been tested only with maildir fs layout with separate inbox folder
+mail_driver = maildir
+mailbox_list_layout = fs
+mail_inbox_path = INBOX
+
+# Localized mailbox folders will use sane filesystem folder names
+mailbox_list_utf8 = yes
+
+# This namespace is used for LMTP mail delivery only
+namespace inbox {
+  separator = /
+  prefix = "INBOX/"
+}
+
+
+mail_uid = vmail
+mail_gid = vmail
+mail_privileged_group = mail
+
+mail_plugins {
+  virtual = yes
+  acl = yes
+  fts = yes
+  fts_flatcurve = yes
+}
+
+fts flatcurve {
+}
+
+
+protocol !indexer-worker {
+}

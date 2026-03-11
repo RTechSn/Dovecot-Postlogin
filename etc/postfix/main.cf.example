@@ -1,0 +1,52 @@
+
+# --------  Warning! This is not a drop-in and ready to use config. This is not a complete config file! ---------- #
+# --- This file provides an example values you can apply to your Postfix main.cf to use with Dovecot-Postlogin --- #
+# ---------------- You still have to configure your Postfix authentication and security settings ----------------- #
+
+# List of networks allowed to use this server as a relay. This will request the list of relays from LDAP MailDomains OU.
+mynetworks_style = host
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128 ldap:/etc/postfix/ldap/mynetworks.cf
+
+# List of hostnames Postfix considers as belonging to itself.
+# This should not include any of actual virtual domains, otherwise local delivery method will be used instead of virtual.
+myhostname = mail.mycompany.local
+mydestination = $myhostname, mail.mycompany.local, localhost.mycompany.local, localhost
+
+# Use Dovecot LMTP as the default transport
+virtual_transport = lmtp:unix:private/dovecot-lmtp
+mailbox_transport = lmtp:unix:private/dovecot-lmtp
+
+# Check login on Dovecot for email submission 
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+
+# Checks if given domain belongs to this server 
+virtual_mailbox_domains = proxy:ldap:/etc/postfix/ldap/virtual_mailbox_domains.cf
+
+# Checks if given email address exists on this server
+virtual_mailbox_maps = proxy:ldap:/etc/postfix/ldap/virtual_mailbox_maps.cf
+
+# Checks if given email is someone's alias
+virtual_alias_maps = proxy:ldap:/etc/postfix/ldap/virtual_alias_maps.cf
+
+# Checks if a user is allowed to send mail from an address
+smtpd_sender_login_maps = proxy:ldap:/etc/postfix/ldap/smtpd_sender_login_maps.c
+
+# This will forbid sending outgoing mail directly without a proxy
+relayhost = [0.0.0.0]
+
+# Get relay IP address for given domain, provided the IP is set as mail attribute of a group in MailDomains OU. Using mail attribute is a workaround that allows the default schema.
+sender_dependent_relayhost_maps = proxy:ldap:/etc/postfix/ldap/sender_dependent_relayhost_maps.cf
+
+# Maps different SSL certificates for different domains (Client connections)
+tls_server_sni_maps = hash:/etc/postfix/ssl_certificates.map
+
+# Default SSL certificate
+smtpd_tls_chain_files =
+  /etc/postfix/certs/ssl-cert-snakeoil.key
+  /etc/postfix/certs/ssl-cert-snakeoil.pem
+
+# Trusted certificates
+smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+

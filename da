@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# ----------------------------------------------------------------------------------------------------------------------- #
+# Helper script that runs doveadm and applies dynamic config for given user
+# Essentially runs /usr/bin/doveadm -c "/mnt/mail/homes/user@domain.tld/dovecot-namespaces.conf" "user@domain.tld" params
+# ----------------------------------------------------------------------------------------------------------------------- #
+
+
+set -euo pipefail
+
+# Validate input
+if [[ $# -lt 1 ]]; then
+echo "Usage: $0 <username> [doveadm-options...] <command> [<args>]"
+    exit 1
+fi
+
+user="$1"
+username="${user%%@*}"  # Remove domain portion if present
+shift
+config_file="/mnt/mail/homes/${username}/dovecot-namespaces.conf"
+
+# Verify config file exists
+if [[ ! -f "$config_file" ]]; then
+echo "Error: Config file not found: $config_file" >&2
+    exit 2
+fi
+
+# Command-specific insertion positions (after command name)
+declare -A u_positions=(
+    [acl]=2      # Insert after subcommand (e.g., after 'set')
+    [mailbox]=2
+    [fts]=2
+    [altmove]=1
+    [copy]=1
+    [deduplicate]=1
+    [expunge]=1
+    [fetch]=1
+    [force-resync]=1
+    [import]=1
+    [index]=1
+    [move]=1
+    [purge]=1
+    [save]=1
+    [search]=1
+)
+
+# Find command position
+for ((i=1; i<=$#; i++)); do
+[[ ${!i} == -* ]] && continue  # Skip options
+
+    cmd="${!i}"
+position="${u_positions[$cmd]:-}"
+
+# Insert -u if command requires it
+if [[ -n "$position" ]]; then
+        insert_at=$((i + position))
+set -- "${@:1:insert_at}" -u "$user" "${@:$((insert_at+1))}"
+break
+fi
+done
+
+# Execute doveadm command
+exec /usr/bin/doveadm -c "$config_file" "$@"

@@ -1,0 +1,14 @@
+server_host     = ldaps://dc.mydomain.local
+server_port     = 636
+version         = 3
+bind            = yes
+start_tls       = no
+bind_dn         = vmail@mydomain.local
+bind_pw         = secret
+
+# --- This will return positive result, if given IP address is found in mail attribute of a group in OU=MailDomains  --- #
+search_base     = ou=MailDomains,dc=mydomain,dc=local
+scope           = sub
+query_filter = (&(objectClass=group)(mail=%s))
+result_attribute = cn
+debuglevel      = 0

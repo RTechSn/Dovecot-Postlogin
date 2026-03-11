@@ -1,0 +1,14 @@
+server_host     = ldaps://dc.mydomain.local
+server_port     = 636
+version         = 3
+bind            = yes
+start_tls       = no
+bind_dn         = vmail@mydomain.local
+bind_pw         = secret
+
+# --- This will return primary email address of a user with given otherMailbox email address --- #
+search_base     = ou=company,dc=mydomain,dc=local
+scope           = sub
+query_filter = (&(objectClass=person)(otherMailbox=%s))
+result_attribute = mail
+debuglevel      = 0
