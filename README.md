@@ -20,6 +20,8 @@ Use at your own risk.
 - Virtual folders that include all messages and all messages of that folder in all mailboxe
 
 
+<img width="624" height="300" alt="dovecot-postlogin" src="https://github.com/user-attachments/assets/93cab7fc-3948-4715-9e50-7d7a283602da" />
+
 ## Installation
 
 ### Dovecot
