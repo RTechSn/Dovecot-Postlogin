@@ -9,6 +9,7 @@ mailbox_list_utf8 = yes
 
 # This namespace is used for LMTP mail delivery only
 namespace inbox {
+  inbox = yes
   separator = /
   prefix = "INBOX/"
 }
